@@ -7,7 +7,6 @@ import com.blade.kit.BladeKit;
 import com.blade.kit.DateKit;
 import com.blade.kit.EncryptKit;
 import com.blade.kit.StringKit;
-import com.tale.bootstrap.SqliteJdbc;
 import com.tale.bootstrap.TaleConst;
 import com.tale.model.dto.*;
 import com.tale.model.entity.*;
@@ -198,48 +197,6 @@ public class SiteService {
             return select().from(Comments.class).byId(coid);
         }
         return null;
-    }
-
-    /**
-     * 系统备份
-     */
-    public BackResponse backup(String bkType, String bkPath, String fmt) throws Exception {
-        BackResponse backResponse = new BackResponse();
-        if ("attach".equals(bkType)) {
-            if (StringKit.isBlank(bkPath)) {
-                throw new ValidatorException("请输入备份文件存储路径");
-            }
-            if (!Files.isDirectory(Paths.get(bkPath))) {
-                throw new ValidatorException("请输入一个存在的目录");
-            }
-            String bkAttachDir = CLASSPATH + "upload";
-            String bkThemesDir = CLASSPATH + "templates/themes";
-
-            String fname = DateKit.toString(new Date(), fmt) + "_" + StringKit.rand(5) + ".zip";
-
-            String attachPath = bkPath + "/" + "attachs_" + fname;
-            String themesPath = bkPath + "/" + "themes_" + fname;
-
-            backResponse.setAttach_path(attachPath);
-            backResponse.setTheme_path(themesPath);
-        }
-        // 备份数据库
-        if ("db".equals(bkType)) {
-            String filePath = "upload/" + DateKit.toString(new Date(), "yyyyMMddHHmmss") + "_"
-                + StringKit.rand(8) + ".db";
-            String cp = CLASSPATH + filePath;
-            Files.createDirectory(Paths.get(cp));
-            Files.copy(Paths.get(SqliteJdbc.DB_PATH), Paths.get(cp));
-            backResponse.setSql_path("/" + filePath);
-            // 10秒后删除备份文件
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    new File(cp).delete();
-                }
-            }, 10 * 1000);
-        }
-        return backResponse;
     }
 
     /**
