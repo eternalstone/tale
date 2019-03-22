@@ -6,15 +6,16 @@ package com.tale.bootstrap;
  * @ClassName: MysqlJdbc
  */
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 @Slf4j
 @NoArgsConstructor
@@ -82,33 +83,22 @@ public final class MysqlJdbc {
             Class.forName("com.mysql.jdbc.Driver");
             Connection con = DriverManager.getConnection(jdbc_prop.getProperty("url"), jdbc_prop.getProperty("username"), jdbc_prop.getProperty("password"));
 
-            //测试连接
             Statement statement = con.createStatement();
-//            ResultSet rs  = statement.executeQuery("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='t_options'");
-//            int   count  = rs.getInt(1);
-//            if (count == 0) {
-//                String  cp  = MysqlJdbc.class.getClassLoader().getResource("").getPath();
-//                InputStreamReader isr = new InputStreamReader(new FileInputStream(cp + "schema.sql"), "UTF-8");
-//
-//                String sql = new BufferedReader(isr).lines().collect(Collectors.joining("\n"));
-//                int  r = statement.executeUpdate(sql);
-//                log.info("initialize import database - {}", r);
-//            }
-//            rs.close();
-//            statement.close();
-//            con.close();
+            ResultSet rs  = null;
+            try{
+                //测试连接
+                rs  = statement.executeQuery("SELECT count(*) FROM t_options");
+                log.info("load mysql database successful");
+            }catch (MySQLSyntaxErrorException e){
+                log.info("load mysql database fail , mysql database not init");
+                System.exit(-1);
+            }finally {
+                if(rs!=null) rs.close();
+                statement.close();
+                con.close();
+            }
 
-            String  cp  = MysqlJdbc.class.getClassLoader().getResource("").getPath();
-            InputStreamReader isr = new InputStreamReader(new FileInputStream(cp + "schema.sql"), "UTF-8");
-
-            String sql = new BufferedReader(isr).lines().collect(Collectors.joining("\n"));
-            System.out.println(sql);
-            int  r = statement.executeUpdate(sql);
-
-            log.info("initialize import database - {}", r);
-
-            log.info("initialize database successful");
-        } catch (Exception e) {
+        }  catch (Exception e) {
             log.error("initialize database fail", e);
         }
     }
