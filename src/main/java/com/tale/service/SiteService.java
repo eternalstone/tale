@@ -151,7 +151,7 @@ public class SiteService {
      */
     public List<Archive> getArchives() {
         String sql =
-            "select strftime('%Y年%m月', datetime(created, 'unixepoch') ) as date_str, count(*) as count  from t_contents "
+            "select from_unixtime(created,'%Y年%m月') as date_str, count(*) as count  from t_contents "
                 +
                 "where type = 'post' and status = 'publish' group by date_str order by date_str desc";
 
