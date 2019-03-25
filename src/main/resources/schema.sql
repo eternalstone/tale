@@ -44,36 +44,59 @@ CREATE TABLE `t_comments` (
 
 DROP TABLE IF EXISTS `t_contents`;
 
-CREATE TABLE `t_contents` (
-  `cid` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'post表主键',
-  `title` varchar(200) DEFAULT NULL COMMENT '内容标题',
-  `slug` varchar(200) DEFAULT NULL COMMENT '内容缩略名',
-  `created` int(10) unsigned DEFAULT '0' COMMENT '内容生成时的GMT unix时间戳',
-  `modified` int(10) unsigned DEFAULT '0' COMMENT '内容更改时的GMT unix时间戳',
-  `content` text COMMENT '内容文字',
-  `author_id` int(10) unsigned DEFAULT '0' COMMENT '内容所属用户id',
-  `type` varchar(16) DEFAULT 'post' COMMENT '内容类别',
-  `status` varchar(16) DEFAULT 'publish' COMMENT '内容状态',
-  `tags` varchar(200) DEFAULT NULL COMMENT '标签列表',
-  `categories` varchar(200) DEFAULT NULL COMMENT '分类列表',
-  `hits` int(10) unsigned DEFAULT '0' COMMENT '点击次数',
-  `comments_num` int(10) unsigned DEFAULT '0' COMMENT '内容所属评论数',
-  `allow_comment` tinyint(1) DEFAULT '1' COMMENT '是否允许评论',
-  `allow_ping` tinyint(1) DEFAULT '1' COMMENT '是否允许ping',
-  `allow_feed` tinyint(1) DEFAULT '1' COMMENT '允许出现在聚合中',
-  PRIMARY KEY (`cid`),
-  UNIQUE KEY `slug` (`slug`),
-  KEY `created` (`created`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='内容表';
+CREATE TABLE t_contents (
+  cid INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL UNIQUE,
+  title VARCHAR ( 255 ) NOT NULL,
+  slug VARCHAR ( 255 )  UNIQUE,
+  thumb_img VARCHAR ( 255 ),
+  created INTEGER ( 10 ) NOT NULL,
+  modified INTEGER ( 10 ),
+  content TEXT,
+  author_id INTEGER ( 10 ) NOT NULL,
+  type VARCHAR ( 16 ) NOT NULL,
+  STATUS VARCHAR ( 16 ) NOT NULL,
+  fmt_type VARCHAR ( 16 ) DEFAULT 'markdown',
+  tags VARCHAR ( 200 ),
+  categories VARCHAR ( 200 ),
+  hits INTEGER ( 10 ) DEFAULT 0,
+  comments_num INTEGER ( 1 ) DEFAULT 0,
+  allow_comment INTEGER ( 1 ) DEFAULT 1,
+  allow_ping INTEGER ( 1 ),
+  allow_feed INTEGER ( 1 )
+);
 
-LOCK TABLES `t_contents` WRITE;
+INSERT INTO t_contents (cid, title, slug, created, modified, content, author_id, type, status, tags, categories, hits, comments_num, allow_comment, allow_ping, allow_feed) VALUES (1, '关于', 'about', 1487853610, 1487872488, '### Hello World
+这是我的关于页面
+### 当然还有其他
+具体你来写点什么吧', 1, 'page', 'publish', NULL, NULL, 0, 0, 1, 1, 1);
+INSERT INTO t_contents (cid, title, slug, created, modified, content, author_id, type, status, tags, categories, hits, comments_num, allow_comment, allow_ping, allow_feed) VALUES (2, '第一篇文章', NULL, 1487861184, 1487872798, '## Hello  World.
+> 第一篇文章总得写点儿什么?...
+----------
+<!--more-->
+```java
+public static void main(String[] args){
+    System.out.println(\"Hello Tale.\");
+}
+```', 1, 'post', 'publish', '', '默认分类', 10, 0, 1, 1, 1);
 
-INSERT INTO `t_contents` (`cid`, `title`, `slug`, `created`, `modified`, `content`, `author_id`, `type`, `status`, `tags`, `categories`, `hits`, `comments_num`, `allow_comment`, `allow_ping`, `allow_feed`)
-VALUES
-  (1,'关于','about',1487853610,1487872488,'### Hello World\r\n\r\n这是我的关于页面\r\n\r\n### 当然还有其他\r\n\r\n具体你来写点什么吧',1,'page','publish',NULL,NULL,0,0,1,1,1),
-  (2,'第一篇文章',NULL,1487861184,1487872798,'## Hello  World.\r\n\r\n> 第一篇文章总得写点儿什么?...\r\n\r\n----------\r\n\r\n\r\n<!--more-->\r\n\r\n```java\r\npublic static void main(String[] args){\r\n    System.out.println(\"Hello Tale.\");\r\n}\r\n```',1,'post','publish','','默认分类',10,0,1,1,1);
+INSERT INTO t_contents (allow_feed,allow_ping,allow_comment,comments_num,hits,
+                        categories,tags,fmt_type,status,type,author_id,content,modified,created,thumb_img,slug,title,cid) VALUES (
+  NULL,1,1,0,0,NULL,NULL,'markdown','publish','page',1,'## 友情链接
+- :lock: [王爵的技术博客]()
+- :lock: [cyang.tech]()
+- :lock: [Bakumon''s Blog]()
+## 链接须知
+> 请确定贵站可以稳定运营
+> 原创博客优先，技术类博客优先，设计、视觉类博客优先
+> 经常过来访问和评论，眼熟的
+备注：默认申请友情链接均为内页（当前页面）
+## 基本信息
+                网站名称：Tale博客
+                网站地址：https://tale.biezhi.me
+请在当页通过评论来申请友链，其他地方不予回复
+暂时先这样，同时欢迎互换友链，这个页面留言即可。 ^_^
+还有，我会不定时对无法访问的网址进行清理，请保证自己的链接长期有效。',1505643888,1505643727,NULL,'links','友情链接',3);
 
-UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `t_metas`;
 
